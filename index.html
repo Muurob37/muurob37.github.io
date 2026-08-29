@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RobBot — Content Studio</title>
+<style>
+  :root{
+    --bg:#0b0e14; --surface:#11161f; --surface2:#171d29; --border:#232b3a;
+    --ink:#e8edf6; --muted:#8a94a6; --accent:#25f4ee; --accent2:#fe2c55;
+    --ok:#2de0a0; --warn:#f7b84b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+  /* sidebar */
+  .side{background:var(--surface);border-right:1px solid var(--border);padding:20px 14px;display:flex;flex-direction:column;gap:4px}
+  .logo{font-weight:800;font-size:17px;padding:4px 10px 18px;display:flex;align-items:center;gap:9px}
+  .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+  .nav{display:flex;flex-direction:column;gap:2px}
+  .ni{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:9px;color:var(--muted);font-size:13.5px;cursor:pointer}
+  .ni.on{background:var(--surface2);color:var(--ink);font-weight:600}
+  .ni .ic{width:18px;text-align:center}
+  .side .spacer{flex:1}
+  .acct{display:flex;align-items:center;gap:10px;padding:11px;background:var(--surface2);border:1px solid var(--border);border-radius:11px}
+  .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px}
+  .ac-name{font-size:13px;font-weight:600}
+  .ac-sub{font-size:11px;color:var(--muted)}
+  /* main */
+  .main{padding:26px 34px;max-width:1060px;width:100%}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+  h1{font-size:22px;font-weight:700}
+  .sub{color:var(--muted);font-size:13px;margin-top:3px}
+  .btn{background:var(--accent);color:#04111b;font-weight:700;border:none;padding:10px 16px;border-radius:9px;font-size:13.5px;cursor:pointer}
+  .btn.dark{background:var(--surface2);color:var(--ink);border:1px solid var(--border)}
+  .conn{margin-bottom:20px;display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:16px 18px}
+  .plat{display:flex;align-items:center;gap:11px;flex:1}
+  .pico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800}
+  .pt{color:#000} .pfb{background:#1877f2;color:#fff} .ptt{background:#000;color:#fff}
+  .pname{font-weight:700;font-size:14px}
+  .pstat{font-size:12px;color:var(--ok);display:flex;align-items:center;gap:6px}
+  .pstat .ld{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 7px var(--ok)}
+  .pub{font-size:11px;color:var(--muted);margin-top:2px}
+  /* queue */
+  .qhead{display:flex;align-items:center;justify-content:space-between;margin:8px 0 12px}
+  .qhead h2{font-size:15px;font-weight:700}
+  .pill{font-size:11px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:3px 10px;border-radius:20px}
+  .item{display:flex;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px;margin-bottom:10px;align-items:center}
+  .thumb{width:62px;height:96px;border-radius:9px;background:#26303f;position:relative;overflow:hidden;flex-shrink:0}
+  .thumb .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px}
+  .thumb .bars{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:2px}
+  .thumb .bars i{width:3px;height:12px;background:var(--accent);border-radius:2px}
+  .m-title{font-weight:600;font-size:13.5px}
+  .m-tags{font-size:11px;color:var(--accent);margin-top:3px}
+  .m-meta{font-size:11px;color:var(--muted);margin-top:3px}
+  .stage{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+  .chip{font-size:12px;font-weight:600;padding:4px 11px;border-radius:20px}
+  .chip.ready{background:rgba(45,224,160,.12);color:var(--ok);border:1px solid rgba(45,224,160,.3)}
+  .chip.post{background:rgba(37,244,238,.12);color:var(--accent);border:1px solid rgba(37,244,238,.3)}
+  .chip.done{background:rgba(45,224,160,.16);color:var(--ok);border:1px solid rgba(45,224,160,.35)}
+  .mini{font-size:11px;color:var(--muted)}
+  .icon-btn{background:none;border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer}
+  @media(max-width:760px){.app{grid-template-columns:1fr}.side{display:none}.main{padding:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo"><span class="dot"></span> RobBot Studio</div>
+    <nav class="nav">
+      <div class="ni on"><span class="ic">▤</span> Content Queue</div>
+      <div class="ni"><span class="ic">◷</span> Schedule</div>
+      <div class="ni"><span class="ic">⚒</span> Pipeline</div>
+      <div class="ni"><span class="ic">◈</span> Affiliate Links</div>
+      <div class="ni"><span class="ic">❐</span> Analytics</div>
+      <div class="ni"><span class="ic">⚙</span> Settings</div>
+    </nav>
+    <div class="spacer"></div>
+    <div class="acct">
+      <div class="av">MR</div>
+      <div>
+        <div class="ac-name">muhrobby165</div>
+        <div class="ac-sub">Connected · TikTok</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <div>
+        <h1>Content Queue</h1>
+        <div class="sub">Publish short-form videos to TikTok, Facebook & Threads in one click.</div>
+      </div>
+      <div style="display:flex;gap:9px">
+        <button class="btn dark">+ New Content</button>
+        <button class="btn" id="publishAll">Publish All</button>
+      </div>
+    </div>
+
+    <div class="conn">
+      <div class="plat">
+        <div class="pico ptt">T</div>
+        <div>
+          <div class="pname">TikTok</div>
+          <div class="pstat"><span class="ld"></span> Connected — @muhrobby165</div>
+        </div>
+      </div>
+      <div class="plat">
+        <div class="pico pfb">f</div>
+        <div>
+          <div class="pname">Facebook</div>
+          <div class="pstat"><span class="ld"></span> Connected — Kiツイ 日本Go</div>
+        </div>
+      </div>
+      <div class="plat">
+        <div class="pico pt">T</div>
+        <div>
+          <div class="pname">Threads</div>
+          <div class="pstat" style="color:var(--muted)"><span class="ld" style="background:var(--muted)"></span> Ready</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qhead">
+      <h2>Ready to publish</h2>
+      <span class="pill">3 items · auto-sync</span>
+    </div>
+
+    <div id="queue"></div>
+  </main>
+</div>
+
+<script>
+  const items = [
+    {title:"5 Efek AI Tools yang Bikin Kerja 10x Lebih Cepat", tags:"#ai #aiTools #produktivitas #fyp", meta:"Finansial · 32s · 1080x1920", dur:"00:32"},
+    {title:"Cara Baca Chart Gold untuk Pemula (XAUUSD)", tags:"#forex #gold #xauusd #trading #fyp", meta:"Finansial · 28s · 1080x1920", dur:"00:28"},
+    {title:"Python Satu Baris untuk Analisis Data", tags:"#python #coding #datascience #fyp", meta:"Sains/Coding · 30s · 1080x1920", dur:"00:30"},
+  ];
+  const statuses = ["ready","ready","ready"];
+  const chips = {ready:{t:"QUEUED",c:"chip ready"}, post:{t:"PUBLISHING…",c:"chip post"}, done:{t:"PUBLISHED ✓",c:"chip done"}};
+
+  function render(){
+    const q = document.getElementById("queue"); q.innerHTML="";
+    items.forEach((it,i)=>{
+      const st = statuses[i];
+      const el = document.createElement("div"); el.className="item";
+      el.innerHTML = `
+        <div class="thumb"><span class="play">▶</span><span class="bars"><i></i><i></i><i></i></span></div>
+        <div style="flex:1">
+          <div class="m-title">${it.title}</div>
+          <div class="m-tags">${it.tags}</div>
+          <div class="m-meta">${it.meta}</div>
+        </div>
+        <div class="stage">
+          <span class="chip ${chips[st].c}">${chips[st].t}</span>
+          <span class="mini">${it.dur} · TikTok+FB</span>
+        </div>`;
+      q.appendChild(el);
+    });
+  }
+  render();
+
+  document.getElementById("publishAll").onclick = () => {
+    statuses.fill("post"); render();
+    let n=0;
+    const iv = setInterval(()=>{
+      if(n>=items.length){clearInterval(iv); return;}
+      statuses[n]="done"; n++; render();
+    },1400);
+  };
+</script>
+</body>
+</html>
