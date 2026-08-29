@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Callback</title>
+<style>
+  body{font-family:system-ui;background:#0f1115;color:#e6e6e6;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}
+  .box{background:#1a1d24;border:1px solid #2a2e38;border-radius:12px;padding:30px 40px;max-width:640px;word-break:break-all}
+  code{display:block;background:#0a0c10;border:1px solid #2a2e38;border-radius:8px;padding:14px;margin:12px 0;font-size:13px;color:#7ee0a3}
+  .btn{display:inline-block;background:#fe2c55;color:#fff;border:none;padding:12px 20px;border-radius:8px;font-size:15px;cursor:pointer;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>✅ Callback diterima</h1>
+  <p id="status">Memproses...</p>
+  <div id="codebox" style="display:none">
+    <p>Salin kode ini (yang setelah <b>code=</b>):</p>
+    <code id="code"></code>
+    <button class="btn" onclick="copy()">📋 Salin Kode</button>
+    <span id="copied" style="display:none;margin-left:10px;color:#7ee0a3">✓ Disalin!</span>
+  </div>
+</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const err = params.get('error');
+  if (code) {
+    document.getElementById('status').textContent = 'Berhasil! Kode authorization sudah didapat.';
+    document.getElementById('code').textContent = code;
+    document.getElementById('codebox').style.display = 'block';
+  } else if (err) {
+    document.getElementById('status').textContent = 'Error: ' + err;
+  } else {
+    document.getElementById('status').textContent = 'Tidak ada kode di URL. (Jendela ini mungkin dibuka langsung, bukan dari redirect TikTok.)';
+  }
+  function copy(){
+    const c = document.getElementById('code');
+    navigator.clipboard.writeText(c.textContent.trim()).then(()=>{
+      document.getElementById('copied').style.display='inline';
+      setTimeout(()=>document.getElementById('copied').style.display='none',2000);
+    });
+  }
+</script>
+</body>
+</html>
